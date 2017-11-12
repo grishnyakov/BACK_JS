@@ -1,43 +1,47 @@
 var db = require('./db');
 
-var parseMessage = function(message,idClient){
-    try{
-        var object = JSON.parse(message);
+var parseMessage = function(message,idClient) {
+    try {
+        var arrayObjects = JSON.parse(message);
         console.log(message);
+        arrayObjects.forEach(function (object) {
+            switch (object.Table) {
+
+
+                case "messages":
+                    switch (object.Type) {
+                        case "SELECT":
+                            SelectMessages(object, idClient);
+                            break;
+                        default:
+                            console.error("error parse type", object.Type);
+                            break;
+                    }
+                    break; //case "messages"
+
+
+                case "devices":
+                    switch (object.Type) {
+                        case "SELECT":
+                            SelectDevices(object, idClient);
+                            break;
+                        default:
+                            console.error("error parse type", object.Type);
+                            break;
+                    }
+                    break; //case "devices"
+
+
+                default:
+                    console.error("error parse Table", object.Table);
+                    break;
+            }
+        });
     }
     catch(err){
-        console.error(err);
-        return;
+        console.error("error json parse: ",err);
     }
-
-    switch(object.Table){
-            
-            
-        case "messages":
-            switch(object.Type)
-            {
-                 case "SELECT": SelectMessages(object,idClient); break; 
-                 default: console.error("error parse type",object.Type); break;
-            }
-            break; //case "messages"
-            
-            
-            
-            
-        case "devices":
-            switch(object.Type)
-            {
-                 case "SELECT": SelectDevices(object,idClient); break; 
-                 default: console.error("error parse type",object.Type); break;
-            }
-            break; //case "devices"
-            
-            
-            
-        default: console.error("error parse Table",object.Table); break;
-    }
-
-}
+};
 module.exports.parseMessage = parseMessage;
             
 
@@ -53,7 +57,7 @@ var SelectMessages = function(object,idClient){
         break;
         default: console.error("error parse mode",object.Mode); break;
     }                     
-}
+};
 //Messages -
 
 //Devices +
@@ -68,7 +72,7 @@ var SelectDevices = function(object,idClient){
         break;
         default: console.error("error parse mode",object.Mode); break;
     }                     
-}
+};
 //Devices -                    
 
       
@@ -84,7 +88,7 @@ var generateWhere = function(arrayId,columnName){
             return whereSTR;
         }
     return "error generateWhere";
-}
+};
 
                     
                     
