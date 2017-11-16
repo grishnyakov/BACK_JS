@@ -88,7 +88,9 @@ var SelectDevices = function(object,idClient){
 var AuthUser = function (object,idClient) {
     switch(object.Mode){
         case "in"://вход юзера
-            db.selectQuery("SELECT * FROM users WHERE login="+object.VALUES[0]+" AND password="+object.VALUES[1],
+            var str = "SELECT * FROM users WHERE login='"
+                +object.Values[0]+"' AND password='"+object.Values[1]+"'";
+            db.selectQuery(str,
                 idClient,
                 object);
             break;
