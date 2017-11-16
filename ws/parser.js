@@ -31,6 +31,16 @@ var parseMessage = function(message,idClient) {
                     }
                     break; //case "devices"
 
+                case "auth":
+                    switch (object.Type) {
+                        case "SELECT": //запрос на аутенцификацию
+                            AuthUser(object, idClient);
+                            break;
+                        default:
+                            console.error("error parse type", object.Type);
+                            break;
+                    }
+                    break; //case "devices"
 
                 default:
                     console.error("error parse Table", object.Table);
@@ -53,7 +63,7 @@ var SelectMessages = function(object,idClient){
              generateWhere(object.Values,"id_dev")+
              " LIMIT "+object.Limit,
                     idClient,
-                    object.IdMessage);
+                    object);
         break;
         default: console.error("error parse mode",object.Mode); break;
     }                     
@@ -75,6 +85,16 @@ var SelectDevices = function(object,idClient){
 };
 //Devices -                    
 
+var AuthUser = function (object,idClient) {
+    switch(object.Mode){
+        case "in"://вход юзера
+            db.selectQuery("SELECT * FROM users WHERE login="+object.VALUES[0]+" AND password="+object.VALUES[1],
+                idClient,
+                object);
+            break;
+        default: console.error("error parse mode",object.Mode); break;
+    }
+};
       
 var generateWhere = function(arrayId,columnName){
     if(arrayId.length > 0)

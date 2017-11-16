@@ -25,8 +25,7 @@ var selectQuery = function(sqlstring,idClient,object)
             console.error(err);
         else
             ws.send(result,idClient,object);
-        
     });
    
-}
+};
 module.exports.selectQuery = selectQuery;
