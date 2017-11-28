@@ -5,13 +5,14 @@ var parseMessage = function(message,idClient) {
         var arrayObjects = JSON.parse(message);
         console.log(message);
         arrayObjects.forEach(function (object) {
+            object.idClient = idClient;
             switch (object.Table) {
 
 
                 case "messages":
                     switch (object.Type) {
                         case "SELECT":
-                            SelectMessages(object, idClient);
+                            SelectMessages(object);
                             break;
                         default:
                             console.error("error parse type", object.Type);
@@ -23,7 +24,7 @@ var parseMessage = function(message,idClient) {
                 case "devices":
                     switch (object.Type) {
                         case "SELECT":
-                            SelectDevices(object, idClient);
+                            SelectDevices(object);
                             break;
                         default:
                             console.error("error parse type", object.Type);
@@ -34,7 +35,7 @@ var parseMessage = function(message,idClient) {
                 case "auth":
                     switch (object.Type) {
                         case "SELECT": //запрос на аутенцификацию
-                            AuthUser(object, idClient);
+                            AuthUser(object);
                             break;
                         default:
                             console.error("error parse type", object.Type);
@@ -56,13 +57,12 @@ module.exports.parseMessage = parseMessage;
             
 
 //Messages +
-var SelectMessages = function(object,idClient){
+var SelectMessages = function(object){
     switch(object.Mode){
         case "IdDeviceArray":  
             db.selectQuery("SELECT * FROM messages "+
              generateWhere(object.Values,"id_dev")+
              " LIMIT "+object.Limit,
-                    idClient,
                     object);
         break;
         default: console.error("error parse mode",object.Mode); break;
@@ -71,13 +71,12 @@ var SelectMessages = function(object,idClient){
 //Messages -
 
 //Devices +
-var SelectDevices = function(object,idClient){
+var SelectDevices = function(object){
     switch(object.Mode){
         case "IdUsersArray":  
             db.selectQuery("SELECT * FROM devices "+
              generateWhere(object.Values,"id_user")+
              " LIMIT "+object.Limit,
-                    idClient,
                     object);
         break;
         default: console.error("error parse mode",object.Mode); break;
@@ -85,16 +84,16 @@ var SelectDevices = function(object,idClient){
 };
 //Devices -                    
 
-var AuthUser = function (object,idClient) {
+var AuthUser = function (object) {
     switch(object.Mode){
         case "in"://вход юзера
-            db.authUser(idClient, object);
+            db.authUser(object);
             break;
         case "check"://вход юзера
-            db.requestSession(object.Values[0],idClient, object);
+            db.requestSession(object.Values[0], object);
             break;
         case "close"://вход юзера
-            db.closeSession(object.Values[0],idClient, object);
+            db.closeSession(object.Values[0], object);
             break;
         default: console.error("error parse mode",object.Mode); break;
     }

@@ -31,10 +31,12 @@ webSocketServer.on('connection', function(ws) {
 
 });
 //отправка сообщения клиенту
-var sendMessage = function(message,idClient,reqObj){
-    
+var sendMessage = function(message,reqObj){
+    console.log("MSG for USER: ",message);
     var Error = {Code:0,title:"all ok"}; //ошибка, возвращаемая клиенту
-    
+    if(reqObj.Error != undefined) {
+        Error = reqObj.Error;
+    }
     var answer = {
         IdMessage:reqObj.IdMessage,
         Query:reqObj.Type,
@@ -42,7 +44,7 @@ var sendMessage = function(message,idClient,reqObj){
         Tables:[{Name:reqObj.Table,Data:message}]
     };
         
-    clients[idClient].send(JSON.stringify(answer));
-    console.log("send client:",idClient,reqObj.IdMessage);
+    clients[reqObj.idClient].send(JSON.stringify(answer));
+    console.log("send client:",reqObj.idClient,reqObj.IdMessage);
 };
 module.exports.send = sendMessage;
