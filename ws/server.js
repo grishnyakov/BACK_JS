@@ -30,6 +30,7 @@ webSocketServer.on('connection', function(ws) {
   });
 
 });
+//отправка сообщения клиенту
 var sendMessage = function(message,idClient,reqObj){
     
     var Error = {Code:0,title:"all ok"}; //ошибка, возвращаемая клиенту
@@ -43,5 +44,5 @@ var sendMessage = function(message,idClient,reqObj){
         
     clients[idClient].send(JSON.stringify(answer));
     console.log("send client:",idClient,reqObj.IdMessage);
-}
+};
 module.exports.send = sendMessage;

@@ -88,11 +88,13 @@ var SelectDevices = function(object,idClient){
 var AuthUser = function (object,idClient) {
     switch(object.Mode){
         case "in"://вход юзера
-            var str = "SELECT * FROM users WHERE login='"
-                +object.Values[0]+"' AND password='"+object.Values[1]+"'";
-            db.selectQuery(str,
-                idClient,
-                object);
+            db.authUser(idClient, object);
+            break;
+        case "check"://вход юзера
+            db.requestSession(object.Values[0],idClient, object);
+            break;
+        case "close"://вход юзера
+            db.closeSession(object.Values[0],idClient, object);
             break;
         default: console.error("error parse mode",object.Mode); break;
     }
@@ -112,8 +114,6 @@ var generateWhere = function(arrayId,columnName){
     return "error generateWhere";
 };
 
-                    
-                    
 //
 //    var message_toserver = {
 //        IdMessage: counterMessage++,
