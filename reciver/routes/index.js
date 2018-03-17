@@ -4,11 +4,14 @@ var router = express.Router();
 var db_config = {
     host: "localhost",
     user: "root",
-    password: "",
+    password: "blackhole",
     database: "servergprs",
     port: 3306
 };
 var connection;
+
+//http://89.31.33.164:3000/1234567890/321321321/555/444/333/9/9/9
+
 
 function handleDisconnect() {
     connection = mysql.createConnection(db_config); // Recreate the connection, since
