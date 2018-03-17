@@ -26,6 +26,9 @@ var parseMessage = function(message,idClient) {
                         case "SELECT":
                             SelectDevices(object);
                             break;
+                        case "UPDATE":
+                            RegisterDevices(object);
+                            break;
                         default:
                             console.error("error parse type", object.Type);
                             break;
@@ -82,6 +85,15 @@ var SelectDevices = function(object){
         default: console.error("error parse mode",object.Mode); break;
     }                     
 };
+var RegisterDevices = function(object){
+    switch(object.Mode){
+        case "register": //регистрация устройства за юзером
+
+            db.registerDevice(object);
+            break;
+        default: console.error("error parse mode",object.Mode); break;
+    }
+};
 //Devices -                    
 
 var AuthUser = function (object) {
@@ -89,10 +101,10 @@ var AuthUser = function (object) {
         case "in"://вход юзера
             db.authUser(object);
             break;
-        case "check"://вход юзера
+        case "check"://чек
             db.requestSession(object.Values[0], object);
             break;
-        case "close"://вход юзера
+        case "out"://вход юзера
             db.closeSession(object.Values[0], object);
             break;
         default: console.error("error parse mode",object.Mode); break;
