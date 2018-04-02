@@ -43,8 +43,13 @@ var sendMessage = function(message,reqObj){
         Error:Error,
         Tables:[{Name:reqObj.Table,Data:message}]
     };
-        
-    clients[reqObj.idClient].send(JSON.stringify(answer));
-    console.log("send client:",reqObj.idClient,reqObj.IdMessage);
+    if(clients[reqObj.idClient]) {
+        clients[reqObj.idClient].send(JSON.stringify(answer));
+        console.log("send client:",reqObj.idClient,reqObj.IdMessage);
+    }
+    else{
+        console.log("send client: error- Client not exist");
+    }
+
 };
 module.exports.send = sendMessage;
