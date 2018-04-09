@@ -1,14 +1,14 @@
-var express = require('express');
-var mysql = require('mysql');
-var router = express.Router();
-var db_config = {
+let express = require('express');
+let mysql = require('mysql');
+let app = express();
+let db_config = {
     host: "localhost",
     user: "root",
-    password: "",
+    password: "blackhole",
     database: "servergprs",
     port: 3306
 };
-var connection;
+let connection;
 
 //http://89.31.33.164:3000/1234567890/321321321/555/444/333/9/9/9
 
@@ -35,118 +35,118 @@ function handleDisconnect() {
 }
 handleDisconnect();
 
-
-router.get('/:number/:pass/:data1/:data2/:data3', function (req, res, next) {
-    whoIslient(req);
-    var number = req.params.number,
-        pass = req.params.pass;
-    var params = {
-        data1: req.params.data1,
-        data2: req.params.data2,
-        data3: req.params.data3,
-        data4: -999,
-        data5: -999,
-        data6: -999
-    };
-
-    insertQuery(res, number, pass, params);
-});
-
-router.get('/:number/:pass/:data1/:data2/:data3/:data4', function (req, res, next) {
-    whoIslient(req);
-    var number = req.params.number,
-        pass = req.params.pass;
-    var params = {
-        data1: req.params.data1,
-        data2: req.params.data2,
-        data3: req.params.data3,
-        data4: req.params.data4,
-        data5: -999,
-        data6: -999
-    };
-
-    insertQuery(res, number, pass, params);
-});
-
-router.get('/:number/:pass/:data1/:data2/:data3/:data4/:data5', function (req, res, next) {
-    whoIslient(req);
-    var number = req.params.number,
-        pass = req.params.pass;
-    var params = {
-        data1: req.params.data1,
-        data2: req.params.data2,
-        data3: req.params.data3,
-        data4: req.params.data4,
-        data5: req.params.data5,
-        data6: -999
-    };
-
-    insertQuery(res, number, pass, params);
-});
-
-router.get('/:number/:pass/:data1/:data2/:data3/:data4/:data5/:data6', function (req, res, next) {
-    whoIslient(req);
-    var number = req.params.number,
-        pass = req.params.pass;
-    var params = {
-        data1: req.params.data1,
-        data2: req.params.data2,
-        data3: req.params.data3,
-        data4: req.params.data4,
-        data5: req.params.data5,
-        data6: req.params.data6
-    };
-
-    insertQuery(res, number, pass, params);
-});
-
-
-var insertQuery = function (res, number, pass, params) {
-    console.log("Insert into db: ", number, pass, params);
-    var queryAuth = "SELECT * FROM devices WHERE id = " + number + ";";
-
-    connection.query(queryAuth, function (err, result) {
-        if (err) {
-            console.error(err.sqlMessage);
-            res.sendStatus(401); //401 Unauthorized («не авторизован»)
-        }
-        else {
-            if (result[0].password === pass) {
-                console.log("auth device success", result);
-                var queryInsert = "INSERT INTO messages (id_dev, dt,data1,data2,data3,data4,data5,data6) VALUES (" +
-                    number + "," +
-                    "NOW()" + "," +
-                    params.data1 + "," +
-                    params.data2 + "," +
-                    params.data3 + "," +
-                    params.data4 + "," +
-                    params.data5 + "," +
-                    params.data6
-                    + ");";
-                connection.query(queryInsert, function (err, result) {
-                    if (err) {
-                        console.error(err.sqlMessage);
-                        res.sendStatus(500); //500 Internal Server Error («внутренняя ошибка сервера»)
-                    }
-                    else {
-                        console.log("inserting successful!");
-                        res.sendStatus(200); //OK - хорошо
-                    }
-                });
-
+function splitArrayStr(arrStr) {
+    if(arrStr){
+        let arrayParamsTemp = arrStr.split('&'); // strings params  item as   id=123412
+        let Params = []; // objects  item as  {key: id, value: 123412}
+        for(let index in arrayParamsTemp) {
+            if(arrayParamsTemp[index].indexOf('=') > -1) {
+                Params[arrayParamsTemp[index].split('=')[0]] = arrayParamsTemp[index].split('=')[1];
             }
-            else {
-                console.log("AUTH DEVICE FAIL:", result[0].password," != ",pass);
-                res.sendStatus(401); //401 Unauthorized («не авторизован»)
-            }
+            else console.error("splitArrayStr:: BAD PARAMETR:",arrayParamsTemp[index]," i continue...");
         }
-    });
-
-
-};
-var whoIslient = function (req) {
-    var ip = req.headers["X-Forwarded-For"] || req.connection.remoteAddress;
-    console.log("Connected client:" + ip, req.params);
+        return Params;
+    }
+    else return null;
 }
 
-module.exports = router;
+app.get('/p/:params', function(req, res) {
+    let date = new Date();
+    date = date.toISOString().replace('T',' ').replace('Z','');
+    let ip = req.headers["X-Forwarded-For"] || req.connection.remoteAddress;
+
+    console.log(date," ip:",ip+" APP.GET::",req.params.params);
+
+    let Params = splitArrayStr(req.params.params);
+
+    insertQuery(res, Params);
+});
+
+
+let getValuesStr = function(Params,id_group){
+    let str = "";
+    //(id_group,type_parametr,value)
+    for(let key in Params) {
+        if(key !== "id" && key !=="pwd") {
+            str+="("+id_group+",'"+key+"',"+Params[key]+"),";
+        }
+    }
+    if(str.length>0)
+        str = str.slice(0,-1);
+    return str;
+};
+
+let insertQuery = function (res, params) {
+
+    if(params) {
+        /*algoritm inserting values:
+            1. check existion device
+            2. create group messages
+            3. create params into messages  with group_id (receive from step 2)
+        */
+
+        //step 1
+        let queryAuth = "SELECT * FROM devices WHERE id = " + params['id'] + ";";
+        connection.query(queryAuth, function (err, result) {
+            if (err) {
+                console.error(err.sqlMessage);
+                res.sendStatus(401); //401 Unauthorized («не авторизован»)
+            }
+            else {
+                if(result.length > 0) {
+                    if (result[0].password ===  params['pwd']) {
+                        console.log("auth device success", result);
+
+                        //step 2
+                        //INSERT INTO tbl_name (a,b,c) VALUES(1,2,3),(4,5,6),(7,8,9);
+                        let queryInsertGroup = "INSERT INTO groups_message (id_device) VALUES ("+params['id']+")";
+
+                        connection.query(queryInsertGroup, function (err, result) {
+                            if (err) {
+                                console.error(err.sqlMessage);
+                                res.sendStatus(500); //500 Internal Server Error («внутренняя ошибка сервера»)
+                            }
+                            else {
+                                //step 3
+                                    if(result) {
+
+                                        let id_group = result.insertId;
+                                        console.log(" new id_group:", id_group);
+                                        let values = getValuesStr(params, id_group);
+                                        let queryInsertValue = "INSERT INTO messages (id_group,type_parametr,value) VALUES " + values + ";";
+                                        connection.query(queryInsertValue, function (err, result) {
+                                            console.log(queryInsertValue);
+                                            if (err) {
+                                                console.error(err.sqlMessage);
+                                                res.sendStatus(500); //500 Internal Server Error («внутренняя ошибка сервера»)
+                                            }
+                                            else {
+                                                res.sendStatus(200); //OK - хорошо
+                                            }
+
+                                        });
+
+                                    }
+                                    else res.sendStatus(500); //500 Internal Server Error («внутренняя ошибка се
+                                }
+
+                        });
+
+                    }
+                    else {
+                        console.log("AUTH DEVICE FAIL:", result[0].password," != ", params['pwd']);
+                        res.sendStatus(401); //401 Unauthorized («не авторизован»)
+                    }
+                }
+                else {
+                    console.log("not found device:", params['id']);
+                }
+
+            }
+        });
+    }
+    else res.sendStatus(403); //
+};
+
+
+module.exports = app;
