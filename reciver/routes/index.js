@@ -10,8 +10,6 @@ let db_config = {
 };
 let connection;
 
-//http://89.31.33.164:3000/1234567890/321321321/555/444/333/9/9/9
-
 
 function handleDisconnect() {
     connection = mysql.createConnection(db_config); // Recreate the connection, since
@@ -67,7 +65,7 @@ let getValuesStr = function(Params,id_group){
     let str = "";
     //(id_group,type_parametr,value)
     for(let key in Params) {
-        if(key !== "id" && key !=="pwd") {
+        if(key !== "id" && key !=="pas") {
             str+="("+id_group+",'"+key+"',"+Params[key]+"),";
         }
     }
@@ -94,7 +92,7 @@ let insertQuery = function (res, params) {
             }
             else {
                 if(result.length > 0) {
-                    if (result[0].password ===  params['pwd']) {
+                    if (result[0].password ===  params['pas']) {
                         console.log("auth device success", result);
 
                         //step 2
@@ -134,7 +132,7 @@ let insertQuery = function (res, params) {
 
                     }
                     else {
-                        console.log("AUTH DEVICE FAIL:", result[0].password," != ", params['pwd']);
+                        console.log("AUTH DEVICE FAIL:", result[0].password," != ", params['pas']);
                         res.sendStatus(401); //401 Unauthorized («не авторизован»)
                     }
                 }
