@@ -10,7 +10,7 @@ let db_config = {
 };
 let connection;
 
-//http://89.31.33.164:3000/1234567890/321321321/555/444/333/9/9/9
+//http://89.31.33.164:3300/p/id=1000000006&pas=000000006&t1=29&t1u=25&t2=22&t2u=10&ee=1&vv=0&su=0
 
 
 function handleDisconnect() {
