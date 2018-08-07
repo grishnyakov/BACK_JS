@@ -6,7 +6,7 @@ let db_config = {
     user: "root",
     password: "blackhole",
     database: "servergprs",
-    port: 3306
+    port: 5502
 };
 let connection;
 
