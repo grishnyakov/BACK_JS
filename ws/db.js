@@ -5,7 +5,7 @@ var crypto = require('crypto');
 var db_config = {
     host: "localhost",
     user: "root",
-    password: "",
+    password: "blackhole",
     database: "servergprs",
     port: 3306
 };

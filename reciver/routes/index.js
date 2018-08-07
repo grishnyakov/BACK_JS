@@ -10,6 +10,8 @@ let db_config = {
 };
 let connection;
 
+//http://89.31.33.164:3000/1234567890/321321321/555/444/333/9/9/9
+
 
 function handleDisconnect() {
     connection = mysql.createConnection(db_config); // Recreate the connection, since
@@ -43,39 +45,44 @@ function splitAndCheckArrayStr(arrStr,db_params) {
                 let short_name = arrayParamsTemp[index].split('=')[0];
                 let value = arrayParamsTemp[index].split('=')[1];
                 let id_danger = 0;
-                //step 2 (check parametr on alert)
-                for(let key in db_params) {
-                    console.log("db_params[key]",db_params[key]);
-
-                    if(db_params[key].short_name === short_name) {
-
-                        // булевые 0 - проблема
-                        // булевые 1 - ок
 
 
-                        if(db_params[key].id_type_parametr == 1) {  //id_type_parametr = 0 - bool 1- diapason
+                    //step 2 (check parametr on alert)
+                    for(let key in db_params) {
+                        //console.log("db_params[key]",db_params[key]);
 
-                            if(db_params[key].danger_value_min >= value || db_params[key].danger_value_max <= value)
-                                id_danger = 2; // 2 - AVARIYA
-                            else id_danger = 1; // 1 - OK
+                        if((db_params[key].short_name === short_name) && short_name != "su") { //игнорированрие su
+
+                            // булевые 0 - проблема
+                            // булевые 1 - ок
+
+                            if(db_params[key].id_type_parametr == 1) {  //id_type_parametr = 0 - bool 1- diapason
+
+                                if(db_params[key].danger_value_min >= value || db_params[key].danger_value_max <= value)
+                                    id_danger = 2; // 2 - AVARIYA
+                                else id_danger = 1; // 1 - OK
+                            }
+                            else {
+                                if(value == 0)
+                                    id_danger = 2; // 2 - AVARIYA
+                                else id_danger = 1; // 1 - OK
+                            }
+
+                            break;
                         }
-                        else {
-                            if(value == 0)
-                                id_danger = 2; // 2 - AVARIYA
-                            else id_danger = 1; // 1 - OK
-                        }
-
-                        break;
+                        else id_danger = 1; // 1 - OK
                     }
-                }
 
 
-                //push in array
-                Params[short_name] = {
+                    //push in array
+                    Params[short_name] = {
                         value: value,
                         id_danger: id_danger
                     };
-                console.log(Params[short_name]);
+                    console.log(Params[short_name]);
+
+
+
             }
             else console.error("splitArrayStr:: BAD PARAMETR:",arrayParamsTemp[index]," i continue...");
         }
