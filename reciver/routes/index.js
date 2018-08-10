@@ -11,7 +11,7 @@ let db_config = {
 let connection;
 
 //http://89.31.33.164:3300/p/id=1000000006&pas=000000006&t1=29&t1u=25&t2=22&t2u=10&ee=1&vv=0&su=0
-
+//http://device.sit45.ru:3300/p/id=1000000006&pas=000000006&t1=29&t1u=25&t2=22&t2u=10&ee=1&vv=0&su=0
 
 function handleDisconnect() {
     connection = mysql.createConnection(db_config); // Recreate the connection, since
@@ -79,7 +79,7 @@ function splitAndCheckArrayStr(arrStr,db_params) {
                         value: value,
                         id_danger: id_danger
                     };
-                    console.log(Params[short_name]);
+                    //console.log(Params[short_name]);
 
 
 
@@ -96,7 +96,8 @@ app.get('/p/:params', function(req, res) {
     date = date.toISOString().replace('T',' ').replace('Z','');
     let ip = req.headers["X-Forwarded-For"] || req.connection.remoteAddress;
 
-    console.log(date," ip:",ip+" APP.GET::",req.params.params);
+    console.log("");
+    console.log("____________",date," ip:",ip+" APP.GET::",req.params.params);
 
     /* pre-inserting actions
         1. select * from parametrs (get max and min value)
@@ -159,7 +160,7 @@ let insertQuery = function (res, params,id_danger_forgroup) {
             else {
                 if(result.length > 0) {
                     if (result[0].password ===  params['pas'].value) {
-                        console.log("auth device success", result);
+                        //console.log("auth device success", result);
 
                         //step 3
                         //INSERT INTO tbl_name (a,b,c) VALUES(1,2,3),(4,5,6),(7,8,9);
@@ -175,11 +176,11 @@ let insertQuery = function (res, params,id_danger_forgroup) {
                                     if(result) {
 
                                         let id_group = result.insertId;
-                                        console.log(" new id_group:", id_group);
+                                        //console.log(" new id_group:", id_group);
                                         let values = getValuesStr(params, id_group);
                                         let queryInsertValue = "INSERT INTO messages (id_group,type_parametr,value,id_danger) VALUES " + values + ";";
                                         connection.query(queryInsertValue, function (err, result) {
-                                            console.log(queryInsertValue);
+                                            //console.log(queryInsertValue);
                                             if (err) {
                                                 console.error(err.sqlMessage);
                                                 res.sendStatus(500); //500 Internal Server Error («внутренняя ошибка сервера»)
@@ -198,12 +199,12 @@ let insertQuery = function (res, params,id_danger_forgroup) {
 
                     }
                     else {
-                        console.log("AUTH DEVICE FAIL:", result[0].password," != ", params['pas']);
+                        console.error("AUTH DEVICE FAIL:", result[0].password," != ", params['pas']);
                         res.sendStatus(401); //401 Unauthorized («не авторизован»)
                     }
                 }
                 else {
-                    console.log("not found device:", params['id']);
+                    console.error("not found device:", params['id']);
                 }
 
             }
