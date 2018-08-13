@@ -37,7 +37,7 @@ handleDisconnect();
 
 function splitAndCheckArrayStr(arrStr,db_params) {
     if(arrStr){
-        console.log("db_params",db_params);
+        //console.log("db_params",db_params);
         let arrayParamsTemp = arrStr.split('&'); // strings params  item as   id=123412
         let Params = {}; // objects  item as  {key: id, {value: 123412, id_danger: 0}
         for(let index in arrayParamsTemp) {
@@ -186,7 +186,7 @@ let insertQuery = function (res, params,id_danger_forgroup) {
                                                 res.sendStatus(500); //500 Internal Server Error («внутренняя ошибка сервера»)
                                             }
                                             else {
-                                                res.sendStatus(200); //OK - хорошо
+                                                res.send(201,"5,77,89,10"); //OK - хорошо
                                             }
 
                                         });
