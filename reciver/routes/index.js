@@ -186,7 +186,7 @@ let insertQuery = function (res, params,id_danger_forgroup) {
                                                 res.sendStatus(500); //500 Internal Server Error («внутренняя ошибка сервера»)
                                             }
                                             else {
-                                                res.send(201,"5,77,89,10"); //OK - хорошо
+                                                res.status(201).send("5,77,89,10");
                                             }
 
                                         });
