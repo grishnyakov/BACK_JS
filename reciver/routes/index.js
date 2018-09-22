@@ -47,6 +47,7 @@ function splitAndCheckArrayStr(arrStr, db_params) {
 
                         break;
                     }
+                    else id_danger = 1; // 1 - OK
                 }
 
 
@@ -55,7 +56,7 @@ function splitAndCheckArrayStr(arrStr, db_params) {
                     value: value,
                     id_danger: id_danger
                 };
-                console.log(Params[short_name]);
+                //console.log(Params[short_name]);
             }
             else console.error("splitArrayStr:: BAD PARAMETR:", arrayParamsTemp[index], " i continue...");
         }
