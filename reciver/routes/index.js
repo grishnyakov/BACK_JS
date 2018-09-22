@@ -167,7 +167,8 @@ function checkExistDevice(res, connection, params, id_danger_for_group) {
                 }
             }
             else {
-                console.log("not found device:", params['id']);
+                console.log("not found device:", params['id'], 'return 401 Unauthorized');
+                res.sendStatus(401); //401 Unauthorized («не авторизован»)
                 connection.release();
             }
 
