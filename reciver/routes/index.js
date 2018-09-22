@@ -25,7 +25,7 @@ function splitAndCheckArrayStr(arrStr, db_params) {
                 let id_danger = 0;
                 //step 2 (check parametr on alert)
                 for (let key in db_params) {
-                    console.log("db_params[key]", db_params[key]);
+                    //console.log("db_params[key]", db_params[key]);
 
                     if (db_params[key].short_name === short_name && short_name != "su") { //игнорирование su
 
