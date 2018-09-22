@@ -15,7 +15,7 @@ let pool = mysql.createPool(db_config);
 
 function splitAndCheckArrayStr(arrStr, db_params) {
     if (arrStr) {
-        console.log("db_params", db_params);
+        //console.log("db_params", db_params);
         let arrayParamsTemp = arrStr.split('&'); // strings params  item as   id=123412
         let Params = {}; // objects  item as  {key: id, {value: 123412, id_danger: 0}
         for (let index in arrayParamsTemp) {
@@ -72,37 +72,42 @@ app.get('/p/:params', function (req, res) {
         // Соединение извлечено из пула. Обратите внимание, вам не нужно
         // создавать соединение. Пул вернет вам уже существующее свободное соединение
         // или сам создаст новое.
-
         let date = new Date();
-        date = date.toISOString().replace('T', ' ').replace('Z', '');
-        let ip = req.headers["X-Forwarded-For"] || req.connection.remoteAddress;
+        if(!err){
+            console.log(date,'connected!');
+            date = date.toISOString().replace('T', ' ').replace('Z', '');
+            let ip = req.headers["X-Forwarded-For"] || req.connection.remoteAddress;
 
-        console.log(date, " ip:", ip + " APP.GET::", req.params.params);
+            console.log(date, " ip:", ip + " APP.GET::", req.params.params);
 
-        /* pre-inserting actions
-            1. select * from parametrs (get max and min value)
-        */
+            /* pre-inserting actions
+                1. select * from parametrs (get max and min value)
+            */
 
-        let query = "SELECT * FROM parametrs;";
-        connection.query(query, function (err, result) {
-            if (!err && result) {
-                let db_params = result;
-                let id_danger_for_group = 0;
-                let Params = splitAndCheckArrayStr(req.params.params, db_params);
-                for (let key in Params) {
-                    if (Params[key].id_danger == 2) {
-                        id_danger_for_group = 2;
-                        break;
+            let query = "SELECT * FROM parametrs;";
+            connection.query(query, function (err, result) {
+                if (!err && result) {
+                    let db_params = result;
+                    let id_danger_for_group = 0;
+                    let Params = splitAndCheckArrayStr(req.params.params, db_params);
+                    for (let key in Params) {
+                        if (Params[key].id_danger == 2) {
+                            id_danger_for_group = 2;
+                            break;
+                        }
+                        else id_danger_for_group = 1;
                     }
-                    else id_danger_for_group = 1;
+                    insertQuery(res, connection, Params, id_danger_for_group);
                 }
-                insertQuery(res, connection, Params, id_danger_for_group);
-            }
-            else {
-                console.error(err);
-                connection.release();
-            }
-        });
+                else {
+                    console.error(err);
+                    connection.release();
+                }
+            });
+        }
+        else {
+            console.error(date,'cannot create connect');
+        }
 
 
     });
