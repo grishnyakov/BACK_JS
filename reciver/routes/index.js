@@ -27,7 +27,7 @@ function splitAndCheckArrayStr(arrStr, db_params) {
                 for (let key in db_params) {
                     console.log("db_params[key]", db_params[key]);
 
-                    if (db_params[key].short_name === short_name) {
+                    if (db_params[key].short_name === short_name && short_name != "su") { //игнорирование su
 
                         // булевые 0 - проблема
                         // булевые 1 - ок
